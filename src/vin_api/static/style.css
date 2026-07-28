@@ -127,9 +127,9 @@ button {
   cursor: pointer;
   padding: 1rem 1.5rem;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   font-family: inherit;
-  color: #fff;
+  color: var(--shadow-grey);
   background: var(--accent-primary);
   border: none;
   border-radius: var(--radius-md);
