@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}VIN Decoder API{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://unpkg.com/htmx.org@2.0.0" integrity="sha384-wS5/0L89q3Hh5nK72gK6I5vL/O+tK1XQv+5Xw7u+aO8q/JokDk2aCjA1V1h+aV=" crossorigin="anonymous"></script>
+</head>
+<body>
+    <header>
+        <h1>VIN Decoder</h1>
+        <p>Powered by the National Highway Traffic Safety Administration vPIC Database</p>
+    </header>
+    
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>Built with FastAPI and HTMX.</p>
+    </footer>
+</body>
+</html>

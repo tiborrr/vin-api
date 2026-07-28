@@ -1,0 +1,15 @@
+<div class="result-card">
+    <div class="result-header">
+        <h2>VIN: {{ result.vin }}</h2>
+        <span class="badge valid">Valid</span>
+    </div>
+    
+    <div class="result-grid">
+        {% for detail in result.details %}
+            <div class="result-item">
+                <div class="result-label" title="{{ detail.group }}">{{ detail.variable }}</div>
+                <div class="result-value">{{ detail.value }}</div>
+            </div>
+        {% endfor %}
+    </div>
+</div>

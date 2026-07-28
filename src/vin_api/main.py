@@ -1,10 +1,13 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 import asyncio
 from contextlib import asynccontextmanager
 import logging
+from pathlib import Path
 
 from .api.routes import router
 from .scraper.db_updater import check_and_update_db
+from .ui.routes import router as ui_router
 
 logger = logging.getLogger(__name__)
 
@@ -41,8 +44,10 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-app.include_router(router)
+# Mount Static Files
+BASE_DIR = Path(__file__).resolve().parent
+app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
 
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to the VIN Validation API. Check out /docs for interactive documentation."}
+# Include Routers
+app.include_router(ui_router)
+app.include_router(router)

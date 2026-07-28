@@ -10,7 +10,8 @@ TEST_VIN = "5UXWX7C5*BA"
 def test_read_root():
     response = client.get("/")
     assert response.status_code == 200
-    assert "message" in response.json()
+    assert "text/html" in response.headers["content-type"]
+    assert "VIN Decoder" in response.text
 
 def test_validate_vin_simple():
     response = client.get(f"/api/v1/vin/{TEST_VIN}/simple")
