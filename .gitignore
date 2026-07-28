@@ -1,0 +1,41 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv
+venv/
+ENV/
+env/
+.env
+
+# Python package stuff
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs and databases
+*.log
+*.sqlite
+dump_*/
+*.zip
+*.backup
+*.custom
+postgres_data/
+.latest_db_version
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
