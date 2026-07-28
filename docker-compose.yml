@@ -10,13 +10,18 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vpic -d vpic_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   db-init:
     build: .
     restart: "no"
     depends_on:
       db:
-        condition: service_started
+        condition: service_healthy
     command: ["python", "-m", "vin_api.scraper.db_updater"]
     environment:
       - DATABASE_URL=postgresql+psycopg://vpic:vpic_password@db:5432/vpic_db
