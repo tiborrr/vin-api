@@ -7,10 +7,8 @@ import zipfile
 
 import httpx
 
+from ..config import get_settings
 from ..constants import (
-    DEFAULT_POSTGRES_CONTAINER,
-    DEFAULT_POSTGRES_DB,
-    DEFAULT_POSTGRES_USER,
     NHTSA_DUMP_FILENAME_TEMPLATE,
     NHTSA_VPIC_BASE_URL,
     VERSION_TRACKER_FILE,
@@ -18,15 +16,12 @@ from ..constants import (
 
 logger = logging.getLogger(__name__)
 
-async def check_and_update_db(
-    container_name: str = os.environ.get("POSTGRES_CONTAINER", DEFAULT_POSTGRES_CONTAINER),
-    db_user: str = os.environ.get("POSTGRES_USER", DEFAULT_POSTGRES_USER),
-    db_name: str = os.environ.get("POSTGRES_DB", DEFAULT_POSTGRES_DB)
-):
+async def check_and_update_db():
     """
     Checks if a new DB dump is available for the current year/month or recent months.
     If available and not already applied, it downloads and restores it.
     """
+    settings = get_settings()
     # Look back up to 3 months
     today = datetime.date.today()
     found_url = None
@@ -84,7 +79,7 @@ async def check_and_update_db(
         return
 
     logger.info(f"Restoring {custom_file} to Postgres...")
-    cmd = f"docker exec -i {container_name} pg_restore -U {db_user} -d {db_name} < {custom_file}"
+    cmd = f"docker exec -i {settings.postgres_container} pg_restore -U {settings.postgres_user} -d {settings.postgres_db} < {custom_file}"
     try:
         subprocess.run(cmd, shell=True, check=False) # pg_restore often returns 1 for non-fatal errors
         logger.info("Database restore complete.")
