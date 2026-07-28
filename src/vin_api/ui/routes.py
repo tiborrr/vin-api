@@ -1,3 +1,4 @@
+from functools import lru_cache
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, Query, Request
@@ -10,14 +11,17 @@ from ..api.models import VinDecodeDetail
 from ..constants import SP_VIN_DECODE_COLUMNS
 from ..database.database import get_db
 
+
 # Setup templates
-BASE_DIR = Path(__file__).resolve().parent.parent
-templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+@lru_cache
+def get_templates():
+    base_dir = Path(__file__).resolve().parent.parent
+    return Jinja2Templates(directory=str(base_dir / "templates"))
 
 router = APIRouter(tags=["ui"])
 
 @router.get("/", response_class=HTMLResponse)
-async def home(request: Request):
+async def home(request: Request, templates: Jinja2Templates = Depends(get_templates)):
     """
     Render the main search interface.
     """
@@ -30,7 +34,8 @@ async def home(request: Request):
 async def validate_vin_ui(
     request: Request,
     vin: str = Query(..., min_length=11, max_length=17),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    templates: Jinja2Templates = Depends(get_templates)
 ):
     """
     HTMX endpoint to validate and decode a VIN, returning an HTML partial.
