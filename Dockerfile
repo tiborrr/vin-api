@@ -27,7 +27,10 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 FROM debian:bookworm-slim
 
 # Install postgresql-client for pg_restore and cleanup
-RUN apt-get update && apt-get install -y postgresql-client && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y curl gnupg && \
+    curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /usr/share/keyrings/postgresql-keyring.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/postgresql-keyring.gpg] http://apt.postgresql.org/pub/repos/apt bookworm-pgdg main" > /etc/apt/sources.list.d/postgresql.list && \
+    apt-get update && apt-get install -y postgresql-client && rm -rf /var/lib/apt/lists/*
 
 # Setup a non-root user
 RUN groupadd --system --gid 999 nonroot \

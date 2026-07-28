@@ -109,6 +109,8 @@ async def check_and_update_db():
         "-U", settings.postgres_user,
         "-d", settings.postgres_db,
         "-1",
+        "--no-owner",
+        "--no-privileges",
         custom_file
     ]
 
