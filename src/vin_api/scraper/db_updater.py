@@ -79,9 +79,23 @@ async def check_and_update_db():
         return
 
     logger.info(f"Restoring {custom_file} to Postgres...")
-    cmd = f"docker exec -i {settings.postgres_container} pg_restore -U {settings.postgres_user} -d {settings.postgres_db} < {custom_file}"
+    
+    env = os.environ.copy()
+    if hasattr(settings, 'postgres_password') and settings.postgres_password:
+        env['PGPASSWORD'] = settings.postgres_password
+
+    cmd = [
+        "pg_restore",
+        "-h", settings.postgres_host,
+        "-p", str(settings.postgres_port),
+        "-U", settings.postgres_user,
+        "-d", settings.postgres_db,
+        "-1",
+        custom_file
+    ]
+
     try:
-        subprocess.run(cmd, shell=True, check=False) # pg_restore often returns 1 for non-fatal errors
+        subprocess.run(cmd, env=env, check=False) # pg_restore often returns 1 for non-fatal errors
         logger.info("Database restore complete.")
     except Exception as e:
         logger.error(f"Database restore failed: {e}")

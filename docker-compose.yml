@@ -1,16 +1,32 @@
 version: '3.8'
+
 services:
   db:
-    image: postgres:17
-    container_name: vin-api-db-1
+    image: postgres:16
+    restart: always
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-vpic}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vpic_password}
-      POSTGRES_DB: ${POSTGRES_DB:-vpic_db}
+      POSTGRES_USER: vpic
+      POSTGRES_PASSWORD: vpic_password
+      POSTGRES_DB: vpic_db
     ports:
-      - "${POSTGRES_PORT:-5433}:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  api:
+    build: .
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+psycopg://vpic:vpic_password@db:5432/vpic_db
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=vpic
+      - POSTGRES_PASSWORD=vpic_password
+      - POSTGRES_DB=vpic_db
 
 volumes:
   postgres_data:

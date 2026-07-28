@@ -8,7 +8,9 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+psycopg://vpic:vpic_password@127.0.0.1:5433/vpic_db"
     
     # Scraper & Docker Update Settings
-    postgres_container: str = "vin-api-db-1"
+    postgres_host: str = "127.0.0.1"
+    postgres_port: int = 5433
+    postgres_password: str = "vpic_password"
     postgres_user: str = "vpic"
     postgres_db: str = "vpic_db"
     db_update_interval_seconds: int = 86400
