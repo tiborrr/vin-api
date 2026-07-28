@@ -1,17 +1,27 @@
-import httpx
 import asyncio
 import datetime
-import zipfile
+import logging
 import os
 import subprocess
-import logging
+import zipfile
+
+import httpx
+
+from ..constants import (
+    DEFAULT_POSTGRES_CONTAINER,
+    DEFAULT_POSTGRES_DB,
+    DEFAULT_POSTGRES_USER,
+    NHTSA_DUMP_FILENAME_TEMPLATE,
+    NHTSA_VPIC_BASE_URL,
+    VERSION_TRACKER_FILE,
+)
 
 logger = logging.getLogger(__name__)
 
 async def check_and_update_db(
-    container_name: str = os.environ.get("POSTGRES_CONTAINER", "vin-api-db-1"),
-    db_user: str = os.environ.get("POSTGRES_USER", "vpic"),
-    db_name: str = os.environ.get("POSTGRES_DB", "vpic_db")
+    container_name: str = os.environ.get("POSTGRES_CONTAINER", DEFAULT_POSTGRES_CONTAINER),
+    db_user: str = os.environ.get("POSTGRES_USER", DEFAULT_POSTGRES_USER),
+    db_name: str = os.environ.get("POSTGRES_DB", DEFAULT_POSTGRES_DB)
 ):
     """
     Checks if a new DB dump is available for the current year/month or recent months.
@@ -25,24 +35,25 @@ async def check_and_update_db(
     async with httpx.AsyncClient() as client:
         for i in range(3):
             d = today - datetime.timedelta(days=i*30)
-            url = f"https://vpic.nhtsa.dot.gov/downloads/vPICList_lite_{d.year}_{d.month:02d}.custom.zip"
+            filename = NHTSA_DUMP_FILENAME_TEMPLATE.format(year=d.year, month=d.month)
+            url = f"{NHTSA_VPIC_BASE_URL}/{filename}"
             try:
                 response = await client.head(url)
                 if response.status_code == 200:
                     found_url = url
-                    target_zip = f"vPICList_lite_{d.year}_{d.month:02d}.custom.zip"
+                    target_zip = filename
                     break
             except Exception as e:
                 logger.error(f"Error checking {url}: {e}")
 
-    if not found_url:
+    if not found_url or not target_zip:
         logger.info("No recent database dumps found.")
         return
 
     # We use a simple local file to track the last restored version.
-    version_file = ".latest_db_version"
+    version_file = VERSION_TRACKER_FILE
     if os.path.exists(version_file):
-        with open(version_file, "r") as f:
+        with open(version_file) as f:
             if f.read().strip() == target_zip:
                 logger.info(f"Database dump {target_zip} already downloaded and restored. Skipping update.")
                 return
@@ -50,11 +61,10 @@ async def check_and_update_db(
     logger.info(f"Downloading new database dump: {found_url}")
     
     # Download
-    async with httpx.AsyncClient() as client:
-        async with client.stream('GET', found_url) as r:
-            with open(target_zip, 'wb') as f:
-                async for chunk in r.aiter_bytes():
-                    f.write(chunk)
+    async with httpx.AsyncClient() as client, client.stream('GET', found_url) as r:
+        with open(target_zip, 'wb') as f:
+            async for chunk in r.aiter_bytes():
+                f.write(chunk)
 
     logger.info("Extracting...")
     dump_dir = f"dump_{target_zip}"

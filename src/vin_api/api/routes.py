@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import text
 
+from ..constants import SP_VIN_DECODE_COLUMNS
 from ..database.database import get_db
-from .models import VinSimpleResponse, VinDecodeResponse, VinDecodeDetail
+from .models import VinDecodeDetail, VinDecodeResponse, VinSimpleResponse
 
 router = APIRouter(prefix="/api/v1/vin", tags=["vin"])
 
@@ -12,13 +13,12 @@ async def validate_vin_simple(vin: str, db: AsyncSession = Depends(get_db)):
     """
     Simple, fast endpoint to validate a VIN by calling scalar functions.
     """
-    query = text("""
-        SELECT 
-            vpic.fvinwmi(:vin) as wmi,
-            vpic.fvinmodelyear2(:vin) as model_year,
-            vpic.fvincheckdigit(:vin) as check_digit
-    """)
-    result = await db.execute(query, {"vin": vin})
+    query = select(
+        func.vpic.fvinwmi(vin).label("wmi"),
+        func.vpic.fvinmodelyear2(vin).label("model_year"),
+        func.vpic.fvincheckdigit(vin).label("check_digit")
+    )
+    result = await db.execute(query)
     row = result.fetchone()
     
     if not row:
@@ -37,12 +37,9 @@ async def validate_vin_complex(vin: str, db: AsyncSession = Depends(get_db)):
     """
     Complex, slower endpoint that returns full decoding information.
     """
-    query = text("""
-        SELECT variable, value, code, datatype, groupname 
-        FROM vpic.spvindecode(:vin)
-        WHERE value IS NOT NULL AND value != ''
-    """)
-    result = await db.execute(query, {"vin": vin})
+    sp_func = func.vpic.spvindecode(vin).table_valued(*SP_VIN_DECODE_COLUMNS)
+    query = select(sp_func).where(sp_func.c.value.isnot(None), sp_func.c.value != '')
+    result = await db.execute(query)
     rows = result.fetchall()
     
     details = []

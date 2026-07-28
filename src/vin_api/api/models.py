@@ -1,6 +1,8 @@
-from pydantic import BaseModel, ConfigDict, Field
-from typing import Optional, Any
 from datetime import datetime
+from typing import Any
+
+from pydantic import BaseModel, ConfigDict, Field
+
 
 class Abs(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -128,7 +130,7 @@ class Country(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     name: str
-    displayorder: Optional[int] = None
+    displayorder: int | None = None
 
 class Custommotorcycletype(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -144,58 +146,58 @@ class Decodingoutput(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     addedon: datetime
-    groupname: Optional[str] = None
-    variable: Optional[str] = None
-    value: Optional[str] = None
-    keys: Optional[str] = None
-    wmiid: Optional[int] = None
-    patternid: Optional[int] = None
-    vinschemaid: Optional[int] = None
-    elementid: Optional[int] = None
-    attributeid: Optional[str] = None
-    createdon: Optional[datetime] = None
-    code: Optional[str] = None
-    datatype: Optional[str] = None
-    decode: Optional[str] = None
-    source: Optional[str] = None
+    groupname: str | None = None
+    variable: str | None = None
+    value: str | None = None
+    keys: str | None = None
+    wmiid: int | None = None
+    patternid: int | None = None
+    vinschemaid: int | None = None
+    elementid: int | None = None
+    attributeid: str | None = None
+    createdon: datetime | None = None
+    code: str | None = None
+    datatype: str | None = None
+    decode: str | None = None
+    source: str | None = None
 
 class Defaultvalue(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     elementid: int
     vehicletypeid: int
-    defaultvalue: Optional[str] = None
-    createdon: Optional[datetime] = None
-    updatedon: Optional[datetime] = None
+    defaultvalue: str | None = None
+    createdon: datetime | None = None
+    updatedon: datetime | None = None
 
 class DefsBody(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
-    def_: Optional[str] = Field(None, alias="def")
-    body_type: Optional[str] = None
+    def_: str | None = Field(None, alias="def")
+    body_type: str | None = None
     from_year: int
-    to_year: Optional[int] = None
+    to_year: int | None = None
     mode: int
 
 class DefsMake(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
-    def_: Optional[str] = Field(None, alias="def")
-    ncic_code: Optional[str] = None
-    make_type: Optional[str] = None
+    def_: str | None = Field(None, alias="def")
+    ncic_code: str | None = None
+    make_type: str | None = None
     from_year: int
-    to_year: Optional[int] = None
+    to_year: int | None = None
     mode: int
 
 class DefsModel(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     make: int
     id: int
-    def_: Optional[str] = Field(None, alias="def")
-    model_type: Optional[str] = None
-    includes: Optional[str] = None
+    def_: str | None = Field(None, alias="def")
+    model_type: str | None = None
+    includes: str | None = None
     from_year: int
-    to_year: Optional[int] = None
+    to_year: int | None = None
     mode: int
 
 class Destinationmarket(BaseModel):
@@ -232,17 +234,17 @@ class Element(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     name: str
-    code: Optional[str] = None
-    lookuptable: Optional[str] = None
-    description: Optional[str] = None
-    isprivate: Optional[bool] = None
-    groupname: Optional[str] = None
-    datatype: Optional[str] = None
-    minallowedvalue: Optional[int] = None
-    maxallowedvalue: Optional[int] = None
-    isqs: Optional[bool] = None
-    decode: Optional[str] = None
-    weight: Optional[int] = None
+    code: str | None = None
+    lookuptable: str | None = None
+    description: str | None = None
+    isprivate: bool | None = None
+    groupname: str | None = None
+    datatype: str | None = None
+    minallowedvalue: int | None = None
+    maxallowedvalue: int | None = None
+    isqs: bool | None = None
+    decode: str | None = None
+    weight: int | None = None
 
 class Engineconfiguration(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -253,7 +255,7 @@ class Enginemodel(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     name: str
-    description: Optional[str] = None
+    description: str | None = None
 
 class Enginemodelpattern(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -261,8 +263,8 @@ class Enginemodelpattern(BaseModel):
     enginemodelid: int
     elementid: int
     attributeid: str
-    createdon: Optional[datetime] = None
-    updatedon: Optional[datetime] = None
+    createdon: datetime | None = None
+    updatedon: datetime | None = None
 
 class Entertainmentsystem(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -273,8 +275,8 @@ class Errorcode(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     name: str
-    additionalerrortext: Optional[str] = None
-    weight: Optional[int] = None
+    additionalerrortext: str | None = None
+    weight: int | None = None
 
 class Evdriveunit(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -310,9 +312,9 @@ class Grossvehicleweightrating(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     name: str
-    sortorder: Optional[int] = None
-    minrangeweight: Optional[int] = None
-    maxrangeweight: Optional[int] = None
+    sortorder: int | None = None
+    minrangeweight: int | None = None
+    maxrangeweight: int | None = None
 
 class Keylessignition(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -343,16 +345,16 @@ class Make(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     name: str
-    createdon: Optional[datetime] = None
-    updatedon: Optional[datetime] = None
+    createdon: datetime | None = None
+    updatedon: datetime | None = None
 
 class MakeModel(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     makeid: int
     modelid: int
-    createdon: Optional[datetime] = None
-    updatedon: Optional[datetime] = None
+    createdon: datetime | None = None
+    updatedon: datetime | None = None
 
 class Manufacturer(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -369,8 +371,8 @@ class Model(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     name: str
-    createdon: Optional[datetime] = None
-    updatedon: Optional[datetime] = None
+    createdon: datetime | None = None
+    updatedon: datetime | None = None
 
 class Motorcyclechassistype(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -399,9 +401,9 @@ class Pattern(BaseModel):
     keys: str
     elementid: int
     attributeid: str
-    createdon: Optional[datetime] = None
-    updatedon: Optional[datetime] = None
-    keys_regex: Optional[str] = None
+    createdon: datetime | None = None
+    updatedon: datetime | None = None
+    keys_regex: str | None = None
 
 class Pedestrianautomaticemergencybraking(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -485,18 +487,18 @@ class Vehiclespecpattern(BaseModel):
     iskey: bool
     elementid: int
     attributeid: str
-    createdon: Optional[datetime] = None
-    updatedon: Optional[datetime] = None
+    createdon: datetime | None = None
+    updatedon: datetime | None = None
 
 class Vehiclespecschema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     makeid: int
     createdon: datetime
-    updatedon: Optional[datetime] = None
-    vehicletypeid: Optional[int] = None
-    sourcedate: Optional[datetime] = None
-    tobeqced: Optional[bool] = None
+    updatedon: datetime | None = None
+    vehicletypeid: int | None = None
+    sourcedate: datetime | None = None
+    tobeqced: bool | None = None
 
 class VehiclespecschemaModel(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -514,52 +516,52 @@ class Vehicletype(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     name: str
-    displayorder: Optional[int] = None
-    formtype: Optional[int] = None
-    description: Optional[str] = None
-    includeinequipplant: Optional[bool] = None
+    displayorder: int | None = None
+    formtype: int | None = None
+    description: str | None = None
+    includeinequipplant: bool | None = None
 
 class Vindescriptor(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     descriptor: str
     modelyear: int
-    createdon: Optional[datetime] = None
-    updatedon: Optional[datetime] = None
+    createdon: datetime | None = None
+    updatedon: datetime | None = None
 
 class Vinexception(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     vin: str
     checkdigit: bool
-    createdon: Optional[datetime] = None
-    updatedon: Optional[datetime] = None
+    createdon: datetime | None = None
+    updatedon: datetime | None = None
 
 class Vinschema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     name: str
-    sourcewmi: Optional[str] = None
-    createdon: Optional[datetime] = None
-    updatedon: Optional[datetime] = None
-    tobeqced: Optional[bool] = None
+    sourcewmi: str | None = None
+    createdon: datetime | None = None
+    updatedon: datetime | None = None
+    tobeqced: bool | None = None
 
 class Vncsabodytype(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    id: Optional[int] = None
-    name: Optional[str] = None
+    id: int | None = None
+    name: str | None = None
 
 class Vncsamake(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    id: Optional[int] = None
-    name: Optional[str] = None
+    id: int | None = None
+    name: str | None = None
 
 class Vncsamodel(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    id: Optional[int] = None
-    name: Optional[str] = None
-    makeid: Optional[int] = None
-    originalid: Optional[int] = None
+    id: int | None = None
+    name: str | None = None
+    makeid: int | None = None
+    originalid: int | None = None
 
 class Vspecschemapattern(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -580,17 +582,17 @@ class Wmi(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     wmi: str
-    manufacturerid: Optional[int] = None
-    makeid: Optional[int] = None
-    vehicletypeid: Optional[int] = None
-    createdon: Optional[datetime] = None
-    updatedon: Optional[datetime] = None
-    countryid: Optional[int] = None
-    publicavailabilitydate: Optional[datetime] = None
-    trucktypeid: Optional[int] = None
-    processedon: Optional[datetime] = None
-    noncompliant: Optional[bool] = None
-    noncompliantsetbyovsc: Optional[bool] = None
+    manufacturerid: int | None = None
+    makeid: int | None = None
+    vehicletypeid: int | None = None
+    createdon: datetime | None = None
+    updatedon: datetime | None = None
+    countryid: int | None = None
+    publicavailabilitydate: datetime | None = None
+    trucktypeid: int | None = None
+    processedon: datetime | None = None
+    noncompliant: bool | None = None
+    noncompliantsetbyovsc: bool | None = None
 
 class WmiMake(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -603,37 +605,37 @@ class WmiVinschema(BaseModel):
     wmiid: int
     vinschemaid: int
     yearfrom: int
-    yearto: Optional[int] = None
-    orgid: Optional[int] = None
+    yearto: int | None = None
+    orgid: int | None = None
 
 class Wmiyearvalidchars(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     wmi: str
     year: int
-    position: Optional[int] = None
-    char: Optional[str] = None
+    position: int | None = None
+    char: str | None = None
 
 class WmiyearvalidcharsCacheexceptions(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    WMI: Optional[Any] = None
-    CreatedOn: Optional[Any] = None
-    Id: Optional[int] = None
+    WMI: Any | None = None
+    CreatedOn: Any | None = None
+    Id: int | None = None
 
 # --- API Response Models ---
 
 class VinSimpleResponse(BaseModel):
     vin: str
-    wmi: Optional[str] = None
-    model_year: Optional[int] = None
-    check_digit: Optional[str] = None
+    wmi: str | None = None
+    model_year: int | None = None
+    check_digit: str | None = None
     is_valid: bool
 
 class VinDecodeDetail(BaseModel):
     variable: str
     value: str
     code: str
-    group: Optional[str] = None
+    group: str | None = None
 
 class VinDecodeResponse(BaseModel):
     vin: str

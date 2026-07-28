@@ -1,5 +1,6 @@
+
 import psycopg
-import sys
+
 
 def map_type(pg_type):
     if pg_type in ['integer', 'smallint', 'bigint']:

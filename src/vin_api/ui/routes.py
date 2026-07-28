@@ -1,12 +1,14 @@
-from fastapi import APIRouter, Depends, Request, Query
-from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import text
 from pathlib import Path
 
-from ..database.database import get_db
+from fastapi import APIRouter, Depends, Query, Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+from sqlalchemy import func, select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from ..api.models import VinDecodeDetail
+from ..constants import SP_VIN_DECODE_COLUMNS
+from ..database.database import get_db
 
 # Setup templates
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -34,8 +36,8 @@ async def validate_vin_ui(
     HTMX endpoint to validate and decode a VIN, returning an HTML partial.
     """
     # Simple validation first to check check-digit validity quickly
-    check_query = text("SELECT vpic.fvincheckdigit(:vin) as check_digit")
-    check_result = await db.execute(check_query, {"vin": vin})
+    check_query = select(func.vpic.fvincheckdigit(vin).label("check_digit"))
+    check_result = await db.execute(check_query)
     check_row = check_result.fetchone()
     
     if not check_row or check_row.check_digit is None or len(str(check_row.check_digit)) == 0:
@@ -46,12 +48,9 @@ async def validate_vin_ui(
         )
     
     # Perform full decode if check digit is valid
-    query = text("""
-        SELECT variable, value, code, datatype, groupname 
-        FROM vpic.spvindecode(:vin)
-        WHERE value IS NOT NULL AND value != ''
-    """)
-    result = await db.execute(query, {"vin": vin})
+    sp_func = func.vpic.spvindecode(vin).table_valued(*SP_VIN_DECODE_COLUMNS)
+    query = select(sp_func).where(sp_func.c.value.isnot(None), sp_func.c.value != '')
+    result = await db.execute(query)
     rows = result.fetchall()
     
     if not rows:

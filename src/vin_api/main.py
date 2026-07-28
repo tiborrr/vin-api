@@ -1,18 +1,17 @@
-from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
 import asyncio
-from contextlib import asynccontextmanager
 import logging
+from contextlib import asynccontextmanager, suppress
 from pathlib import Path
 
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+
 from .api.routes import router
+from .constants import DB_UPDATE_INTERVAL_SECONDS
 from .scraper.db_updater import check_and_update_db
 from .ui.routes import router as ui_router
 
 logger = logging.getLogger(__name__)
-
-# Run the update once a day (86400 seconds)
-UPDATE_INTERVAL_SECONDS = 86400 
 
 async def scheduled_db_update():
     while True:
@@ -22,8 +21,8 @@ async def scheduled_db_update():
         except Exception as e:
             logger.error(f"Error during scheduled database update: {e}")
         
-        logger.info(f"Sleeping for {UPDATE_INTERVAL_SECONDS} seconds until next update check.")
-        await asyncio.sleep(UPDATE_INTERVAL_SECONDS)
+        logger.info(f"Sleeping for {DB_UPDATE_INTERVAL_SECONDS} seconds until next update check.")
+        await asyncio.sleep(DB_UPDATE_INTERVAL_SECONDS)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -32,10 +31,8 @@ async def lifespan(app: FastAPI):
     yield
     # Shutdown: Cancel the task
     task.cancel()
-    try:
+    with suppress(asyncio.CancelledError):
         await task
-    except asyncio.CancelledError:
-        pass
 
 app = FastAPI(
     title="VIN Validation API",

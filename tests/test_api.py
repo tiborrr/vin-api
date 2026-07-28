@@ -1,5 +1,5 @@
 from fastapi.testclient import TestClient
-import pytest
+
 from vin_api.main import app
 
 client = TestClient(app)
