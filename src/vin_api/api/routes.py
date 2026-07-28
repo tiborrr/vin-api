@@ -1,13 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
-from typing import List, Dict, Any
 
 from ..database.database import get_db
+from .models import VinSimpleResponse, VinDecodeResponse, VinDecodeDetail
 
 router = APIRouter(prefix="/api/v1/vin", tags=["vin"])
 
-@router.get("/{vin}/simple")
+@router.get("/{vin}/simple", response_model=VinSimpleResponse)
 async def validate_vin_simple(vin: str, db: AsyncSession = Depends(get_db)):
     """
     Simple, fast endpoint to validate a VIN by calling scalar functions.
@@ -24,15 +24,15 @@ async def validate_vin_simple(vin: str, db: AsyncSession = Depends(get_db)):
     if not row:
         raise HTTPException(status_code=404, detail="VIN information could not be evaluated.")
         
-    return {
-        "vin": vin,
-        "wmi": row.wmi,
-        "model_year": row.model_year,
-        "check_digit": row.check_digit,
-        "is_valid": row.check_digit is not None and len(str(row.check_digit)) > 0
-    }
+    return VinSimpleResponse(
+        vin=vin,
+        wmi=row.wmi,
+        model_year=row.model_year,
+        check_digit=row.check_digit,
+        is_valid=row.check_digit is not None and len(str(row.check_digit)) > 0
+    )
 
-@router.get("/{vin}/decode")
+@router.get("/{vin}/decode", response_model=VinDecodeResponse)
 async def validate_vin_complex(vin: str, db: AsyncSession = Depends(get_db)):
     """
     Complex, slower endpoint that returns full decoding information.
@@ -45,17 +45,16 @@ async def validate_vin_complex(vin: str, db: AsyncSession = Depends(get_db)):
     result = await db.execute(query, {"vin": vin})
     rows = result.fetchall()
     
-    decode_result: Dict[str, Any] = {
-        "vin": vin,
-        "details": []
-    }
-    
+    details = []
     for row in rows:
-        decode_result["details"].append({
-            "variable": row.variable,
-            "value": row.value,
-            "code": row.code,
-            "group": row.groupname
-        })
+        details.append(VinDecodeDetail(
+            variable=row.variable,
+            value=row.value,
+            code=row.code,
+            group=row.groupname
+        ))
         
-    return decode_result
+    return VinDecodeResponse(
+        vin=vin,
+        details=details
+    )
