@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     postgres_db: str = "vpic_db"
     db_update_interval_seconds: int = 86400
 
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore", frozen=True)
 
 
 @lru_cache
