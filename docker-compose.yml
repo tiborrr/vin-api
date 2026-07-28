@@ -1,5 +1,6 @@
 services:
   db:
+    container_name: vin-api-db
     image: postgres:latest
     restart: always
     environment:
@@ -17,6 +18,7 @@ services:
       retries: 10
 
   db-init:
+    container_name: vin-api-db-init
     build: .
     restart: "no"
     depends_on:
@@ -32,6 +34,7 @@ services:
       - POSTGRES_DB=vpic_db
 
   api:
+    container_name: vin-api
     build: .
     restart: always
     depends_on:
