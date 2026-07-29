@@ -1,30 +1,47 @@
-# VIN API
+<div align="center">
+  <h1>🚙 VPIC VIN API Service</h1>
+  <p><i>A blazing-fast, self-hosted API to validate and decode Vehicle Identification Numbers (VINs) using the official NHTSA vPIC database.</i></p>
 
-A fast and highly reliable API to validate and decode Vehicle Identification Numbers (VINs) using the official NHTSA vPIC PostgreSQL database.
+  [![Docker Pulls](https://img.shields.io/docker/pulls/tiborrr/vpic-api-service?style=for-the-badge&logo=docker)](https://hub.docker.com/r/tiborrr/vpic-api-service)
+  [![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+  [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+  [![Python](https://img.shields.io/badge/Python-3.14-FFD43B?style=for-the-badge&logo=python&logoColor=blue)](https://www.python.org/)
+</div>
 
-This project features a blazing-fast FastAPI backend, bulk validation endpoints, and a lightweight HTMX frontend. It automatically downloads, extracts, and restores the latest vPIC database dump into a Dockerized PostgreSQL instance.
+---
 
-[![Docker Image Version (latest by date)](https://img.shields.io/docker/v/tiborrr/vpic-api-service)](https://hub.docker.com/r/tiborrr/vpic-api-service)
+## ✨ Features
 
-## Features
+- **⚡️ Blazing Fast:** Built on FastAPI with highly-optimized PostgreSQL `UNNEST` queries and native scalar functions.
+- **🛡️ True DB Validation:** Connects to an actual PostgreSQL instance running the native NHTSA database structure for 100% offline accuracy—no rate limits, no network latency.
+- **🔄 Auto-Initialization:** Our custom `db-init` container automatically scrapes NHTSA for the latest database dumps and gracefully restores them on startup.
+- **📦 Bulk Validation:** Validate up to 100 VINs concurrently in a single network request.
+- **🌐 HTMX Frontend:** Includes a sleek, modern, Javascript-free UI for decoding VINs right from your browser.
+- **🐳 Docker Native:** Ready-to-use Docker images published automatically to Docker Hub.
 
-- **True DB Validation**: Connects to an actual PostgreSQL instance running the native NHTSA database structure for 100% accuracy.
-- **Auto-Initialization**: Docker compose handles scraping NHTSA for the latest database dumps and gracefully restores them on startup.
-- **Fast Endpoints**: Provides a simple validation and a high-performance bulk endpoint leveraging PostgreSQL `UNNEST` and native scalar functions.
-- **Rich Endpoints**: Provides a complex decode endpoint using the `vpic.spvindecode` stored procedure.
-- **HTMX Frontend**: Includes a sleek, modern UI for decoding VINs right from your browser.
-- **Docker Hub Images**: Ready-to-use Docker images published automatically on releases.
+---
 
-## Requirements
+## 🏗 Architecture
 
-- Docker & Docker Compose
+The application is fully containerized and orchestrates its own data lifecycle automatically:
 
-## Quick Start (Docker Compose)
+```mermaid
+graph TD
+    A[Docker Compose Up] --> B[(PostgreSQL DB)]
+    B -->|Healthcheck Pass| C[DB-Init Container]
+    C -->|1. Scrape NHTSA<br>2. Download Dump<br>3. pg_restore| B
+    C -->|Graceful Exit| D[FastAPI Service]
+    D -->|Port 8000| E((Web UI & API))
+```
+
+---
+
+## 🚀 Quick Start (Docker Compose)
 
 The easiest way to run the service is using Docker Compose. This automatically spins up the database, initializes the NHTSA schema, and launches the API.
 
-### 1. Environment Configuration
-Copy the example environment file and customize it if needed (defaults are fine for local testing).
+### 1. Configure Environment
+Copy the example environment file (defaults are fine for local testing).
 ```bash
 cp .env.example .env
 ```
@@ -34,39 +51,39 @@ Bring up the entire stack in detached mode:
 ```bash
 docker compose up -d
 ```
-
-**What happens?**
-1. The `db` container (PostgreSQL) starts.
-2. The `db-init` container waits for the database, downloads the latest vPIC dump, and seeds the schema. *(Note: This can take a few minutes as the database is large).*
-3. The `api` container waits for `db-init` to finish, then starts the FastAPI web server.
+> **Note:** The `db-init` step downloads and restores a large PostgreSQL dump. It may take a few minutes for the API to become available on the very first run.
 
 ### 3. Access the Service
-- **Web UI:** [http://localhost:8000/](http://localhost:8000/)
-- **Swagger Documentation:** [http://localhost:8000/docs](http://localhost:8000/docs)
-- **ReDoc:** [http://localhost:8000/redoc](http://localhost:8000/redoc)
+- **🖥️ Web UI:** [http://localhost:8000/](http://localhost:8000/)
+- **📖 Swagger UI:** [http://localhost:8000/docs](http://localhost:8000/docs)
+- **📚 ReDoc:** [http://localhost:8000/redoc](http://localhost:8000/redoc)
 
-## Using the Docker Hub Image
+---
 
-If you want to pull the pre-built image directly from Docker Hub rather than building it locally, you can use:
+## 🐳 Using the Docker Hub Image
+
+For production deployments or CI environments, you can pull the pre-built image directly from Docker Hub:
+
 ```bash
 docker pull tiborrr/vpic-api-service:latest
 ```
-*(This is ideal for production deployments or CI environments)*.
 
-## API Endpoints
+---
 
-- **Simple Validation**: `GET /api/v1/vin/{vin}/simple`
-  Fast endpoint for basic validation, year, and WMI extraction.
-- **Bulk Validation**: `POST /api/v1/vin/bulk-simple`
-  High-performance endpoint that validates up to 100 VINs concurrently.
-- **Complex Decode**: `GET /api/v1/vin/{vin}/decode`
-  Returns all the rich detailed attributes for the provided VIN.
+## 📡 API Endpoints
 
-## Testing
+| Endpoint | Method | Description |
+|---|---|---|
+| `/api/v1/vin/{vin}/simple` | `GET` | Extremely fast endpoint for basic validation, year, and WMI extraction. |
+| `/api/v1/vin/bulk-simple` | `POST` | High-performance bulk endpoint. Pass a list of VINs in the JSON body. |
+| `/api/v1/vin/{vin}/decode` | `GET` | Comprehensive decode endpoint using the `vpic.spvindecode` stored procedure. |
+
+---
+
+## 🧪 Testing
 
 This project includes automated tests that run in an isolated Docker container against the real PostgreSQL schema to ensure flawless execution.
 
-To run the test suite:
 ```bash
 docker compose run --build --rm test
 ```
