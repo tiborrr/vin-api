@@ -39,5 +39,3 @@ scripts
 .latest_db_version
 *.sqlite
 
-# Documentation
-README.md
