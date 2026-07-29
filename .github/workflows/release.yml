@@ -74,3 +74,12 @@ jobs:
           generate_release_notes: true
           draft: false
           prerelease: false
+
+      - name: Update Docker Hub Description
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: tiborrr/vpic-api-service
+          short-description: "Blazing-fast VIN decoding API powered by FastAPI, PostgreSQL, and official NHTSA vPIC data."
+          readme-filepath: ./README.md
