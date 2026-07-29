@@ -63,6 +63,14 @@ header h1 {
   margin-bottom: 0.5rem;
 }
 
+.main-logo {
+  max-width: 250px;
+  height: auto;
+  border-radius: var(--radius-md);
+  margin-bottom: 0.5rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
 header p {
   color: var(--text-secondary);
   font-size: 0.95rem;
