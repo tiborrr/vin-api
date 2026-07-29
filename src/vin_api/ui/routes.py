@@ -41,7 +41,10 @@ async def validate_vin_ui(
     HTMX endpoint to validate and decode a VIN, returning an HTML partial.
     """
     # Simple validation first to check check-digit validity quickly
-    check_query = select(func.vpic.fvincheckdigit(vin).label("check_digit"))
+    check_query = select(
+        func.vpic.fvincheckdigit(vin).label("check_digit"),
+        func.vpic.fvindescriptor(vin).label("descriptor")
+    )
     check_result = await db.execute(check_query)
     check_row = check_result.fetchone()
     
@@ -83,6 +86,7 @@ async def validate_vin_ui(
         context={
             "result": {
                 "vin": vin.upper(),
+                "descriptor": check_row.descriptor if check_row else None,
                 "details": details
             }
         }

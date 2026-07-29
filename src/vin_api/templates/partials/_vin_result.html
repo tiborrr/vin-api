@@ -1,6 +1,11 @@
 <div class="result-card">
     <div class="result-header">
-        <h2>VIN: {{ result.vin }}</h2>
+        <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+            <h2>VIN: {{ result.vin }}</h2>
+            {% if result.descriptor %}
+            <span style="font-size: 0.9rem; color: #a1a1aa;">VDS (Descriptor): {{ result.descriptor }}</span>
+            {% endif %}
+        </div>
         <span class="badge valid">Valid</span>
     </div>
     
