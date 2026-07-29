@@ -15,6 +15,7 @@ async def validate_vin_simple(vin: str, db: AsyncSession = Depends(get_db)):
     """
     query = select(
         func.vpic.fvinwmi(vin).label("wmi"),
+        func.vpic.fvindescriptor(vin).label("descriptor"),
         func.vpic.fvinmodelyear2(vin).label("model_year"),
         func.vpic.fvincheckdigit(vin).label("check_digit")
     )
@@ -27,6 +28,7 @@ async def validate_vin_simple(vin: str, db: AsyncSession = Depends(get_db)):
     return VinSimpleResponse(
         vin=vin,
         wmi=row.wmi,
+        descriptor=row.descriptor,
         model_year=row.model_year,
         check_digit=row.check_digit,
         is_valid=row.check_digit is not None and len(str(row.check_digit)) > 0

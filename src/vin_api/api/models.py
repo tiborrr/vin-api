@@ -627,6 +627,7 @@ class WmiyearvalidcharsCacheexceptions(BaseModel):
 class VinSimpleResponse(BaseModel):
     vin: str
     wmi: str | None = None
+    descriptor: str | None = None
     model_year: int | None = None
     check_digit: str | None = None
     is_valid: bool
