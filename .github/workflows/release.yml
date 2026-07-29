@@ -52,9 +52,25 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Generate Release Body
+        run: |
+          echo "## 🚀 Docker Image is Live!" > release_body.md
+          echo "" >> release_body.md
+          echo "You can pull the latest image for this release directly from Docker Hub:" >> release_body.md
+          echo "\`\`\`bash" >> release_body.md
+          echo "docker pull tiborrr/vpic-api-service:${{ github.ref_name }}" >> release_body.md
+          echo "\`\`\`" >> release_body.md
+          echo "" >> release_body.md
+          echo "[**📦 View on Docker Hub**](https://hub.docker.com/r/tiborrr/vpic-api-service)" >> release_body.md
+          echo "" >> release_body.md
+          echo "---" >> release_body.md
+          echo "" >> release_body.md
+          echo "### Changelog" >> release_body.md
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          body_path: release_body.md
           generate_release_notes: true
           draft: false
           prerelease: false
