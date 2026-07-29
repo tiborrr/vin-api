@@ -50,5 +50,27 @@ services:
       - POSTGRES_PASSWORD=vpic_password
       - POSTGRES_DB=vpic_db
 
+  test:
+    container_name: vin-api-test
+    build:
+      context: .
+      target: builder
+      args:
+        UV_NO_DEV: 0
+    profiles:
+      - test
+    restart: "no"
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    command: ["uv", "run", "pytest"]
+    environment:
+      - DATABASE_URL=postgresql+psycopg://vpic:vpic_password@db:5432/vpic_db
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=vpic
+      - POSTGRES_PASSWORD=vpic_password
+      - POSTGRES_DB=vpic_db
+
 volumes:
   postgres_data:
