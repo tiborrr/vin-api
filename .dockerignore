@@ -1,8 +1,43 @@
-.venv
-scratch
-__pycache__
-*.pyc
-.latest_db_version
+# Git
 .git
 .github
+.gitignore
+
+# Python
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+.ruff_cache
+.coverage
+htmlcov
+.tox
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# IDEs / Editors
+.vscode
+.idea
+*.swp
+*.swo
+.cursorignore
+.geminiignore
+
+# Docker (we don't need these inside the container itself)
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Project specific / Temporary
+scratch
+scripts
+.latest_db_version
 *.sqlite
+
+# Documentation
+README.md
