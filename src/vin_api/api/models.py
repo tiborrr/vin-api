@@ -641,3 +641,9 @@ class VinDecodeDetail(BaseModel):
 class VinDecodeResponse(BaseModel):
     vin: str
     details: list[VinDecodeDetail]
+
+class VinBulkRequest(BaseModel):
+    vins: list[str] = Field(..., max_length=100)
+
+class VinBulkResponse(BaseModel):
+    results: list[VinSimpleResponse]

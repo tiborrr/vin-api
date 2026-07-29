@@ -4,7 +4,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..constants import SP_VIN_DECODE_COLUMNS
 from ..database.database import get_db
-from .models import VinDecodeDetail, VinDecodeResponse, VinSimpleResponse
+from .models import (
+    VinBulkRequest,
+    VinBulkResponse,
+    VinDecodeDetail,
+    VinDecodeResponse,
+    VinSimpleResponse,
+)
 
 router = APIRouter(prefix="/api/v1/vin", tags=["vin"])
 
@@ -57,3 +63,39 @@ async def validate_vin_complex(vin: str, db: AsyncSession = Depends(get_db)):
         vin=vin,
         details=details
     )
+
+@router.post("/bulk-simple", response_model=VinBulkResponse)
+async def validate_vin_bulk_simple(request: VinBulkRequest, db: AsyncSession = Depends(get_db)):
+    """
+    Bulk endpoint to validate multiple VINs efficiently in a single query.
+    Limited to 100 VINs at a time.
+    """
+    if not request.vins:
+        return VinBulkResponse(results=[])
+
+    unnested_vins = func.unnest(request.vins).alias("vin_input")
+    v_col = unnested_vins.column
+    
+    query = select(
+        v_col.label("vin"),
+        func.vpic.fvinwmi(v_col).label("wmi"),
+        func.vpic.fvindescriptor(v_col).label("descriptor"),
+        func.vpic.fvinmodelyear2(v_col).label("model_year"),
+        func.vpic.fvincheckdigit(v_col).label("check_digit")
+    ).select_from(unnested_vins)
+    
+    result = await db.execute(query)
+    rows = result.fetchall()
+    
+    results = [
+        VinSimpleResponse(
+            vin=row.vin,
+            wmi=row.wmi,
+            descriptor=row.descriptor,
+            model_year=row.model_year,
+            check_digit=row.check_digit,
+            is_valid=row.check_digit is not None and len(str(row.check_digit)) > 0
+        ) for row in rows
+    ]
+    
+    return VinBulkResponse(results=results)
