@@ -1,5 +1,5 @@
 # First, build the application in the `/app` directory
-FROM ghcr.io/astral-sh/uv:debian-slim AS builder
+FROM ghcr.io/astral-sh/uv:alpine AS builder
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
 
 # Omit development dependencies by default
@@ -25,17 +25,15 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked
 
 # Then, use a final image without uv
-FROM debian:bookworm-slim
+FROM alpine:edge
 
 # Install postgresql-client for pg_restore and cleanup
-RUN apt-get update && apt-get install -y curl gnupg && \
-    curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /usr/share/keyrings/postgresql-keyring.gpg && \
-    echo "deb [signed-by=/usr/share/keyrings/postgresql-keyring.gpg] http://apt.postgresql.org/pub/repos/apt bookworm-pgdg main" > /etc/apt/sources.list.d/postgresql.list && \
-    apt-get update && apt-get install -y postgresql-client && rm -rf /var/lib/apt/lists/*
+RUN apk update && apk add --no-cache postgresql18-client
 
 # Setup a non-root user
-RUN groupadd --system --gid 999 nonroot \
- && useradd --system --gid 999 --uid 999 --create-home nonroot
+# Using 10001 as the ID because 999 is commonly used by ping group in Alpine
+RUN addgroup -g 10001 -S nonroot && \
+    adduser -u 10001 -S nonroot -G nonroot -h /home/nonroot
 
 # Copy the Python version
 COPY --from=builder /python /python
