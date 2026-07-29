@@ -5,11 +5,11 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     # Database Settings
-    database_url: str = "postgresql+psycopg://vpic:vpic_password@127.0.0.1:5433/vpic_db"
+    database_url: str = "postgresql+psycopg://vpic:vpic_password@127.0.0.1:5434/vpic_db"
     
     # Scraper & Docker Update Settings
     postgres_host: str = "127.0.0.1"
-    postgres_port: int = 5433
+    postgres_port: int = 5434
     postgres_password: str = "vpic_password"
     postgres_user: str = "vpic"
     postgres_db: str = "vpic_db"
