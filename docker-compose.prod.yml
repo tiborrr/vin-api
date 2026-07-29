@@ -1,0 +1,54 @@
+services:
+  db:
+    container_name: vin-api-db
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-vpic}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vpic_password}
+      POSTGRES_DB: ${POSTGRES_DB:-vpic_db}
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-vpic} -d $${POSTGRES_DB:-vpic_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  db-init:
+    container_name: vin-api-db-init
+    image: tiborrr/vpic-api-service:latest
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["python", "-m", "vin_api.scraper.db_updater"]
+    environment:
+      - DATABASE_URL=postgresql+psycopg://${POSTGRES_USER:-vpic}:${POSTGRES_PASSWORD:-vpic_password}@db:5432/${POSTGRES_DB:-vpic_db}
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=${POSTGRES_USER:-vpic}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-vpic_password}
+      - POSTGRES_DB=${POSTGRES_DB:-vpic_db}
+
+  api:
+    container_name: vin-api
+    image: tiborrr/vpic-api-service:latest
+    restart: always
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+psycopg://${POSTGRES_USER:-vpic}:${POSTGRES_PASSWORD:-vpic_password}@db:5432/${POSTGRES_DB:-vpic_db}
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=${POSTGRES_USER:-vpic}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-vpic_password}
+      - POSTGRES_DB=${POSTGRES_DB:-vpic_db}
+
+volumes:
+  postgres_data:

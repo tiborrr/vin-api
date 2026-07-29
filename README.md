@@ -36,9 +36,9 @@ graph TD
 
 ---
 
-## 🚀 Quick Start (Docker Compose)
+## 🚀 Quick Start (Development)
 
-The easiest way to run the service is using Docker Compose. This automatically spins up the database, initializes the NHTSA schema, and launches the API.
+The easiest way to run the service locally from source is using Docker Compose. This automatically spins up the database, initializes the NHTSA schema, builds the API from your local code, and launches it.
 
 ### 1. Configure Environment
 Copy the example environment file (defaults are fine for local testing).
@@ -60,13 +60,21 @@ docker compose up -d
 
 ---
 
-## 🐳 Using the Docker Hub Image
+## 🐳 Production Deployment
 
-For production deployments or CI environments, you can pull the pre-built image directly from Docker Hub:
+If you want to deploy the API to a server without downloading the source code, you can use the production compose file which pulls the pre-built images directly from Docker Hub.
 
+**1. Download the production files to your server:**
 ```bash
-docker pull tiborrr/vpic-api-service:latest
+curl -O https://raw.githubusercontent.com/tiborrr/vpic-api-service/main/docker-compose.prod.yml
+curl -o .env https://raw.githubusercontent.com/tiborrr/vpic-api-service/main/.env.example
 ```
+
+**2. Start the production stack:**
+```bash
+docker compose -f docker-compose.prod.yml up -d
+```
+*(This is ideal for VPS deployments or production environments).*
 
 ---
 
