@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import func, select
+from sqlalchemy import func, select, cast, String
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.dialects.postgresql import ARRAY
 
 from ..constants import SP_VIN_DECODE_COLUMNS
 from ..database.database import get_db
@@ -73,7 +74,7 @@ async def validate_vin_bulk_simple(request: VinBulkRequest, db: AsyncSession = D
     if not request.vins:
         return VinBulkResponse(results=[])
 
-    unnested_vins = func.unnest(request.vins).alias("vin_input")
+    unnested_vins = func.unnest(cast(request.vins, ARRAY(String))).alias("vin_input")
     v_col = unnested_vins.column
     
     query = select(
