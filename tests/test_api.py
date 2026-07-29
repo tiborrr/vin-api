@@ -44,14 +44,30 @@ def test_validate_vin_bulk_simple(client):
     results = data["results"]
     assert len(results) == 3
     
-    # First VIN is valid BMW
+    # First VIN is valid BMW pattern (but invalid check digit due to wildcard)
     assert results[0]["vin"] == TEST_VIN
-    assert results[0]["is_valid"] is True
+    assert results[0]["is_valid"] is False
     assert results[0]["wmi"] == "5UX"
     
-    # Second VIN is invalid
+    # Second VIN is completely invalid
     assert results[1]["vin"] == "INVALIDVIN123"
     assert results[1]["is_valid"] is False
     
-    # Third VIN is a generic format
+    # Third VIN is a generic format pattern
     assert results[2]["vin"] == "1G1RC6E4*BU"
+    assert results[2]["is_valid"] is False
+
+def test_concurrent_requests(client):
+    import concurrent.futures
+
+    def make_request():
+        return client.get(f"/api/v1/vin/{TEST_VIN}/simple")
+
+    # Send 50 concurrent requests
+    with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+        futures = [executor.submit(make_request) for _ in range(50)]
+        for future in concurrent.futures.as_completed(futures):
+            response = future.result()
+            assert response.status_code == 200
+            data = response.json()
+            assert data["is_valid"] is False

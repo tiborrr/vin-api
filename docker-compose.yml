@@ -64,6 +64,8 @@ services:
       db-init:
         condition: service_completed_successfully
     command: ["uv", "run", "pytest"]
+    volumes:
+      - .:/app
     environment:
       - DATABASE_URL=postgresql+psycopg://vpic:vpic_password@db:5432/vpic_db
       - POSTGRES_HOST=db
